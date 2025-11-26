@@ -1,0 +1,80 @@
+# Build directories
+build/
+cmake-build-*/
+out/
+
+# IDE directories
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.sln.docstates
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# Object files
+*.o
+*.obj
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Visual Studio
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
+# Debug files
+*.pdb
+*.ilk
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Asset working files (keep source assets)
+*.blend1
+*.blend2
+*.max
+*.maya
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Dependencies (will be managed separately)
+lib/SDL2/
+lib/glad/
+lib/glm/
+lib/stb/
+lib/jolt/
+lib/bullet/
+
+# Keep directory structure
+!.gitkeep
