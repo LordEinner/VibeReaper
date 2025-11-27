@@ -24,18 +24,15 @@ set(SDL2_LIBRARY_DIR "${SDL2_PATH}/lib")
 
 include_directories(${SDL2_INCLUDE_DIR})
 link_directories(${SDL2_LIBRARY_DIR})
-
 # Manually link SDL2 (MinGW requires specific order: mingw32 -> SDL2main -> SDL2)
 set(SDL2_LIBRARIES mingw32 SDL2main SDL2)
 
 # Gather source files
 file(GLOB_RECURSE SOURCES 
-    "src/*.cpp" 
-    "src/*.h"
+    src/*.cpp
+    src/**/*.cpp
+    lib/glad/src/glad.c
 )
-
-# Add GLAD source
-list(APPEND SOURCES "lib/glad/src/glad.c")
 
 # Create executable
 add_executable(VibeReaper ${SOURCES})
@@ -62,3 +59,49 @@ add_custom_command(TARGET VibeReaper POST_BUILD
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
     COMMENT "Copying assets to binary directory..."
 )
+
+# ============================================================================
+# Test Suite (Optional)
+# ============================================================================
+
+option(BUILD_TESTS "Build test suite" OFF)
+
+if(BUILD_TESTS)
+    # Gather engine source files (excluding main.cpp)
+    file(GLOB ENGINE_SOURCES
+        src/Engine/*.cpp
+        src/Utils/*.cpp
+        lib/glad/src/glad.c
+    )
+
+    # Create test executable
+    add_executable(VibeReaperTests
+        tests/test_main.cpp
+        ${ENGINE_SOURCES}
+    )
+
+    # Link libraries
+    target_link_libraries(VibeReaperTests
+        PRIVATE
+        ${SDL2_LIBRARIES}
+        OpenGL::GL
+    )
+
+    # Copy SDL2.dll for tests
+    add_custom_command(TARGET VibeReaperTests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/lib/SDL2/bin/SDL2.dll
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SDL2.dll
+        COMMENT "Copying SDL2.dll for tests..."
+    )
+
+    # Copy assets for tests
+    add_custom_command(TARGET VibeReaperTests POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+        COMMENT "Copying assets for tests..."
+    )
+
+    message(STATUS "Test suite enabled")
+endif()
