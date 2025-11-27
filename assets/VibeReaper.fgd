@@ -1,0 +1,382 @@
+//
+// VibeReaper Game Definition File
+// For use with TrenchBroom level editor
+// Version: 0.1.0
+//
+
+//
+// Base Classes
+//
+
+@BaseClass = BaseEntity
+[
+	targetname(string) : "Name" : : "Entity name for targeting"
+	target(string) : "Target" : : "Name of entity to trigger"
+]
+
+@BaseClass color(0 0 200) = Appearflags
+[
+	spawnflags(flags) =
+	[
+		256 : "Not on Easy" : 0
+		512 : "Not on Normal" : 0
+		1024 : "Not on Hard" : 0
+	]
+]
+
+//
+// Worldspawn
+//
+
+@SolidClass = worldspawn : "World Entity"
+[
+	message(string) : "Level Name"
+	skybox(string) : "Skybox Texture" : "sky_default"
+	ambient(integer) : "Ambient Light" : 20 : "Global ambient light level (0-100)"
+	_fog_density(float) : "Fog Density" : "0.0" : "Fog density (0.0 = no fog)"
+	_fog_color(color255) : "Fog Color" : "128 128 128"
+]
+
+//
+// Player
+//
+
+@PointClass base(BaseEntity) color(0 255 0) size(-16 -16 0, 16 16 64) = info_player_start : "Player Start"
+[
+	angle(integer) : "Facing Angle" : 0 : "Direction player faces (0=East, 90=North, 180=West, 270=South)"
+]
+
+@PointClass base(BaseEntity) color(128 255 128) size(-16 -16 0, 16 16 64) = info_player_deathmatch : "Multiplayer Spawn"
+[
+	angle(integer) : "Facing Angle" : 0
+]
+
+//
+// Lights
+//
+
+@PointClass base(BaseEntity) color(255 255 128) light() = light : "Point Light"
+[
+	light(integer) : "Brightness" : 200 : "Light intensity (100-1000)"
+	_color(color255) : "Color" : "255 255 255" : "RGB color of light"
+	style(choices) : "Style" : 0 : "Light animation style" =
+	[
+		0 : "Normal"
+		1 : "Flicker A"
+		2 : "Slow Pulse"
+		3 : "Candle A"
+		4 : "Fast Strobe"
+		5 : "Gentle Pulse"
+		6 : "Flicker B"
+		10 : "Fluorescent Flicker"
+		11 : "Slow Strobe"
+	]
+	_falloff(choices) : "Falloff" : 0 : "Light attenuation" =
+	[
+		0 : "Linear"
+		1 : "Inverse"
+		2 : "Inverse Square"
+	]
+	wait(float) : "Fade Distance" : 1.0 : "Distance multiplier"
+]
+
+@PointClass base(BaseEntity, Appearflags) color(255 200 128) = light_torch : "Torch Light"
+[
+	light(integer) : "Brightness" : 150
+	_color(color255) : "Color" : "255 150 100"
+	style(integer) : "Style" : 1
+]
+
+@PointClass base(BaseEntity, Appearflags) color(200 200 255) = light_lantern : "Lantern Light"
+[
+	light(integer) : "Brightness" : 180
+	_color(color255) : "Color" : "220 220 255"
+	style(integer) : "Style" : 0
+]
+
+//
+// Enemies
+//
+
+@PointClass base(BaseEntity, Appearflags) color(255 0 0) size(-24 -24 0, 24 24 64) = enemy_demon : "Lesser Demon"
+[
+	health(integer) : "Health" : 50 : "Enemy health points"
+	angle(integer) : "Facing Angle" : 0
+	patrol(choices) : "Behavior" : 0 : "Initial behavior" =
+	[
+		0 : "Stationary"
+		1 : "Patrol"
+		2 : "Aggressive"
+	]
+	patrol_radius(integer) : "Patrol Radius" : 256 : "Radius to patrol around spawn"
+]
+
+@PointClass base(BaseEntity, Appearflags) color(128 0 128) size(-16 -16 0, 16 16 72) = enemy_cultist : "Possessed Cultist"
+[
+	health(integer) : "Health" : 100
+	angle(integer) : "Facing Angle" : 0
+	weapon(choices) : "Weapon Type" : 0 =
+	[
+		0 : "Melee (Dagger)"
+		1 : "Ranged (Crossbow)"
+	]
+]
+
+@PointClass base(BaseEntity, Appearflags) color(180 0 0) size(-32 -32 0, 32 32 80) = enemy_demon_lord : "Demon Lord (Boss)"
+[
+	health(integer) : "Health" : 500
+	angle(integer) : "Facing Angle" : 0
+	phase_count(integer) : "Boss Phases" : 2 : "Number of attack phases"
+]
+
+@PointClass base(BaseEntity, Appearflags) color(80 80 80) size(-12 -12 0, 12 12 24) = enemy_hellhound : "Hellhound"
+[
+	health(integer) : "Health" : 40
+	angle(integer) : "Facing Angle" : 0
+	pack_size(integer) : "Pack Size" : 1 : "Number of hounds spawned together"
+]
+
+//
+// Items
+//
+
+@PointClass base(BaseEntity, Appearflags) color(0 255 0) size(-8 -8 0, 8 8 16) = item_health_small : "Small Health"
+[
+	amount(integer) : "Health Amount" : 25
+	respawn(choices) : "Respawn" : 0 =
+	[
+		0 : "No"
+		1 : "Yes (30 seconds)"
+	]
+]
+
+@PointClass base(BaseEntity, Appearflags) color(0 200 0) size(-12 -12 0, 12 12 24) = item_health_large : "Large Health"
+[
+	amount(integer) : "Health Amount" : 50
+	respawn(choices) : "Respawn" : 0 =
+	[
+		0 : "No"
+		1 : "Yes (60 seconds)"
+	]
+]
+
+@PointClass base(BaseEntity, Appearflags) color(255 255 0) size(-8 -8 0, 8 8 16) = item_ammo_shells : "Shotgun Shells"
+[
+	amount(integer) : "Shell Count" : 10
+	respawn(choices) : "Respawn" : 0 =
+	[
+		0 : "No"
+		1 : "Yes (30 seconds)"
+	]
+]
+
+@PointClass base(BaseEntity, Appearflags) color(128 255 255) size(-12 -12 0, 12 12 20) = item_powerup_rally : "Rally Power Boost"
+[
+	duration(integer) : "Duration (seconds)" : 15 : "How long the powerup lasts"
+	boost(float) : "Rally Boost" : 1.5 : "Multiplier for rally recovery"
+]
+
+//
+// Weapons
+//
+
+@PointClass base(BaseEntity, Appearflags) color(200 100 0) size(-12 -12 0, 12 12 24) = weapon_scythe : "Scythe Weapon"
+[
+	spawnflags(flags) =
+	[
+		1 : "Start in short mode" : 0
+	]
+]
+
+@PointClass base(BaseEntity, Appearflags) color(150 100 50) size(-12 -12 0, 12 12 24) = weapon_shotgun : "Shotgun"
+[
+	ammo(integer) : "Starting Ammo" : 20
+]
+
+//
+// Props
+//
+
+@PointClass base(BaseEntity) color(128 128 128) size(-8 -8 0, 8 8 32) = prop_candle : "Candle"
+[
+	lit(choices) : "Initially Lit" : 1 =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+]
+
+@PointClass base(BaseEntity) color(100 100 100) size(-16 -16 0, 16 16 64) = prop_tombstone : "Tombstone"
+[
+	angle(integer) : "Facing Angle" : 0
+	variant(choices) : "Style" : 0 =
+	[
+		0 : "Cross"
+		1 : "Angel"
+		2 : "Obelisk"
+	]
+]
+
+@PointClass base(BaseEntity) color(80 60 40) size(-24 -24 0, 24 24 80) = prop_statue : "Gothic Statue"
+[
+	angle(integer) : "Facing Angle" : 0
+	variant(choices) : "Type" : 0 =
+	[
+		0 : "Gargoyle"
+		1 : "Saint"
+		2 : "Angel"
+		3 : "Demon"
+	]
+]
+
+//
+// Triggers
+//
+
+@SolidClass base(BaseEntity) color(200 100 200) = trigger_once : "Trigger Once"
+[
+	message(string) : "Message to Display"
+	delay(float) : "Delay Before Trigger" : 0
+]
+
+@SolidClass base(BaseEntity) color(220 100 200) = trigger_multiple : "Trigger Multiple"
+[
+	message(string) : "Message to Display"
+	wait(float) : "Wait Before Reset" : 1
+	delay(float) : "Delay Before Trigger" : 0
+]
+
+@SolidClass base(BaseEntity) color(200 100 100) = trigger_hurt : "Damage Trigger"
+[
+	damage(integer) : "Damage" : 10
+	wait(float) : "Time Between Damage" : 0.5
+]
+
+@SolidClass base(BaseEntity) color(100 200 200) = trigger_teleport : "Teleport Trigger"
+[
+	target(string) : "Destination" : : "Target info_teleport_destination"
+]
+
+@PointClass base(BaseEntity) color(100 255 200) size(-16 -16 0, 16 16 32) = info_teleport_destination : "Teleport Destination"
+[
+	angle(integer) : "Facing Angle" : 0
+]
+
+//
+// Func Entities (Brush-based)
+//
+
+@SolidClass base(BaseEntity) color(128 100 50) = func_door : "Sliding Door"
+[
+	angle(integer) : "Move Angle" : 0 : "Direction door moves (-1=down, -2=up)"
+	speed(integer) : "Speed" : 100
+	wait(float) : "Wait Before Close" : 3 : "-1 = stay open"
+	lip(integer) : "Lip" : 8 : "Amount of brush remaining visible when open"
+	health(integer) : "Health" : 0 : "If > 0, door must be destroyed to open"
+	sounds(choices) : "Sound" : 0 =
+	[
+		0 : "None"
+		1 : "Stone"
+		2 : "Metal"
+		3 : "Wood"
+	]
+	spawnflags(flags) =
+	[
+		1 : "Starts Open" : 0
+		4 : "Don't Link" : 0
+		8 : "Gold Key Required" : 0
+		16 : "Silver Key Required" : 0
+		32 : "Toggle" : 0
+	]
+]
+
+@SolidClass base(BaseEntity) color(100 80 40) = func_door_rotating : "Rotating Door"
+[
+	speed(integer) : "Speed" : 100
+	wait(float) : "Wait Before Close" : 3
+	sounds(choices) : "Sound" : 0 =
+	[
+		0 : "None"
+		1 : "Stone"
+		2 : "Metal"
+		3 : "Wood Creak"
+	]
+	spawnflags(flags) =
+	[
+		1 : "Starts Open" : 0
+		2 : "Reverse Direction" : 0
+		8 : "Gold Key Required" : 0
+		16 : "Silver Key Required" : 0
+		64 : "One Way" : 0
+	]
+]
+
+@SolidClass base(BaseEntity) color(150 100 150) = func_wall : "Breakable Wall"
+[
+	health(integer) : "Health" : 100 : "Health before breaking"
+]
+
+@SolidClass base(BaseEntity) color(0 100 200) = func_water : "Water Volume"
+[
+	damage(integer) : "Damage Per Second" : 0
+	sounds(choices) : "Sound" : 0 =
+	[
+		0 : "None"
+		1 : "Water"
+		2 : "Lava"
+	]
+]
+
+@SolidClass base(BaseEntity) color(100 100 255) = func_illusionary : "Non-Solid Brush"
+[
+	// Brushes player can walk through (decorative)
+]
+
+//
+// Special
+//
+
+@PointClass base(BaseEntity) size(-8 -8 -8, 8 8 8) = info_null : "Info Null"
+[
+	// Used as target destination
+]
+
+@PointClass base(BaseEntity) color(255 128 0) size(-8 -8 -8, 8 8 8) = info_intermission : "Intermission Camera"
+[
+	angle(integer) : "Facing Angle" : 0
+	mangle(string) : "Pitch Yaw Roll" : "0 0 0"
+]
+
+//
+// Ambient Sounds
+//
+
+@PointClass base(BaseEntity) color(200 200 0) = ambient_church_bell : "Church Bell"
+[
+	volume(float) : "Volume" : 1.0
+]
+
+@PointClass base(BaseEntity) color(200 200 0) = ambient_wind : "Wind Sound"
+[
+	volume(float) : "Volume" : 0.5
+]
+
+@PointClass base(BaseEntity) color(200 200 0) = ambient_thunder : "Thunder"
+[
+	volume(float) : "Volume" : 0.8
+]
+
+@PointClass base(BaseEntity) color(200 200 0) = ambient_drip : "Water Drip"
+[
+	volume(float) : "Volume" : 0.4
+]
+
+//
+// Path Nodes (for AI)
+//
+
+@PointClass base(BaseEntity) color(255 128 0) size(-8 -8 -8, 8 8 8) = path_corner : "Path Node"
+[
+	target(string) : "Next Path Node"
+	wait(float) : "Wait Time" : 0
+]

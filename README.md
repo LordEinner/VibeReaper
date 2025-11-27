@@ -121,12 +121,13 @@ VibeReaper/
 - [x] Render textured 3D primitives
 - [x] Mouse orbit and zoom controls
 
-### 📋 Phase 3: TrenchBroom Integration
+### 🔄 Phase 3: TrenchBroom Integration (IN PLANNING)
 - [ ] Quake MAP format parser
-- [ ] Brush-to-mesh conversion
-- [ ] Entity parsing
+- [ ] Brush-to-mesh conversion (CSG to geometry)
+- [ ] Entity parsing and spawning
 - [ ] World/level manager
-- [ ] Custom FGD file for TrenchBroom
+- [x] Custom FGD file for TrenchBroom
+- [x] Planning and architecture design
 - [ ] Test level loading
 
 ### 📋 Phase 4: Player Controller & Input
@@ -281,5 +282,5 @@ TBD - Will be determined once initial development is complete
 
 ---
 
-**Current Status**: Phase 2 complete - 3D rendering system functional, ready for Phase 3 (TrenchBroom integration)
+**Current Status**: Phase 3 planning complete - TrenchBroom integration architecture designed, ready for implementation
 **Last Updated**: 2025-11-27

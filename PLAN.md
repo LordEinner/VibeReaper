@@ -117,10 +117,18 @@
 
 ---
 
-## Phase 3: TrenchBroom Integration (5-6 days)
+## Phase 3: TrenchBroom Integration (5-6 days) 🔄 IN PLANNING
+
+### Planning & Design
+- [x] Research Quake MAP format specification
+- [x] Create PHASE3_GUIDE.md (educational documentation)
+- [x] Create PHASE3_PLAN.md (implementation plan)
+- [x] Design MapLoader architecture and API
+- [x] Design BrushConverter architecture
+- [x] Design World class structure
+- [x] Create custom VibeReaper.fgd file
 
 ### MAP Format Parser
-- [ ] Research Quake MAP format specification
 - [ ] Create src/Engine/MapLoader.h/cpp
   - [ ] Read .map file as text
   - [ ] Parse brush blocks
@@ -159,11 +167,15 @@
 - [ ] Handle custom entities (enemies, items)
 
 ### TrenchBroom Setup
-- [ ] Create custom game.fgd file
-  - [ ] Define info_player_start
-  - [ ] Define light with color/intensity
-  - [ ] Define enemy_demon
-  - [ ] Define enemy_cultist
+- [x] Create custom VibeReaper.fgd file
+  - [x] Define info_player_start
+  - [x] Define light with color/intensity
+  - [x] Define enemy_demon
+  - [x] Define enemy_cultist
+  - [x] Define items and powerups
+  - [x] Define func entities (doors, triggers)
+  - [x] Define ambient sounds
+  - [x] Define props (candles, tombstones, statues)
 - [ ] Create test map in TrenchBroom
   - [ ] Simple room with walls, floor, ceiling
   - [ ] Player spawn point
