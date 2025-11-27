@@ -2,6 +2,27 @@
 
 > AI-friendly checklist for tracking development progress across all phases
 
+---
+
+## 📁 Phase Documentation
+
+Detailed guides and planning documents are located in [`docs/phases/`](docs/phases/):
+
+### Phase 1: Engine Foundation
+- [phase1-guide.md](docs/phases/phase1-guide.md) - Educational guide
+
+### Phase 2: Basic 3D Rendering
+- [phase2-guide.md](docs/phases/phase2-guide.md) - Educational guide
+- [phase2-review.md](docs/phases/phase2-review.md) - Code review (Grade: A-)
+- [phase2-summary.md](docs/phases/phase2-summary.md) - Completion summary
+
+### Phase 3: TrenchBroom Integration
+- [phase3-guide.md](docs/phases/phase3-guide.md) - Educational guide
+- [phase3-plan.md](docs/phases/phase3-plan.md) - Implementation roadmap
+- [phase3-kickoff.md](docs/phases/phase3-kickoff.md) - Planning summary
+
+---
+
 ## Phase 1: Engine Foundation (3-4 days)
 
 ### Build System
