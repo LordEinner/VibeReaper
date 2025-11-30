@@ -60,6 +60,17 @@ namespace VibeReaper {
         UpdatePosition();
     }
 
+    void Camera::SetRotation(float newYaw, float newPitch) {
+        yaw = newYaw;
+        pitch = newPitch;
+        
+        // Clamp pitch
+        if (pitch > 89.0f) pitch = 89.0f;
+        if (pitch < -89.0f) pitch = -89.0f;
+
+        UpdatePosition();
+    }
+
     void Camera::UpdatePosition() {
         // Convert spherical coordinates (yaw, pitch, distance) to Cartesian
         float yawRad = glm::radians(yaw);

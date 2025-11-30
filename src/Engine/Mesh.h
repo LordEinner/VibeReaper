@@ -27,6 +27,15 @@ namespace VibeReaper {
         // Constructor
         Mesh();
         Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+        
+        // Move semantics
+        Mesh(Mesh&& other) noexcept;
+        Mesh& operator=(Mesh&& other) noexcept;
+
+        // Disable copying to prevent double-free of OpenGL buffers
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(const Mesh&) = delete;
+
         ~Mesh();
 
         // Setup mesh buffers on GPU

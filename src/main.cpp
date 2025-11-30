@@ -10,6 +10,7 @@
 #include "Engine/Texture.h"
 #include "Engine/Camera.h"
 #include "Utils/Logger.h"
+#include "Game/World.h"
 
 // Screen dimensions
 const int SCREEN_WIDTH = 1280;
@@ -84,21 +85,54 @@ int main(int argc, char* argv[]) {
     // Load texture
     VibeReaper::Texture texture;
     if (!texture.LoadFromFile("assets/textures/test_texture.png")) {
-        LOG_WARNING("Failed to load test texture");
+        LOG_WARNING("Failed to load test texture, creating fallback white texture");
+        texture.CreateWhiteTexture();
+    }
+
+    // Load world from MAP file
+    VibeReaper::World world;
+    if (!world.LoadMap("assets/maps/debug_test.map")) {
+        LOG_ERROR("Failed to load map, exiting");
+        return -1;
+    }
+
+    // Get player spawn position
+    glm::vec3 playerSpawn = world.GetPlayerSpawnPosition();
+    // Transform spawn position from Z-up to Y-up: (x, y, z) -> (x, z, -y)
+    glm::vec3 engineSpawn(playerSpawn.x, playerSpawn.z, -playerSpawn.y);
+    
+    LOG_INFO("Player spawn (Engine): " + std::to_string(engineSpawn.x) + ", " + 
+             std::to_string(engineSpawn.y) + ", " + std::to_string(engineSpawn.z));
+
+    // Get light position from map (assuming first light found)
+    glm::vec3 lightPos(0.0f, 500.0f, 0.0f); // Default high above
+    std::vector<const VibeReaper::Entity*> lights = world.GetEntitiesByClass("light");
+    if (!lights.empty()) {
+        glm::vec3 mapLightPos = lights[0]->GetOrigin();
+        // Transform light position from Z-up to Y-up
+        lightPos = glm::vec3(mapLightPos.x, mapLightPos.z, -mapLightPos.y);
+        LOG_INFO("Light spawn (Quake): " + std::to_string(mapLightPos.x) + ", " + 
+                 std::to_string(mapLightPos.y) + ", " + std::to_string(mapLightPos.z));
+        LOG_INFO("Light spawn (Engine): " + std::to_string(lightPos.x) + ", " + 
+                 std::to_string(lightPos.y) + ", " + std::to_string(lightPos.z));
+    } else {
+        LOG_INFO("No light found in map, using default at (0, 500, 0)");
     }
 
     // Create camera
     float aspectRatio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
-    VibeReaper::Camera camera(45.0f, aspectRatio);
-    camera.SetTarget(glm::vec3(0.0f, 0.0f, 0.0f));
-    camera.SetDistance(3.5f);
-
+    VibeReaper::Camera camera(45.0f, aspectRatio, 0.1f, 4000.0f);
+    
+    // Set camera to look +X
+    camera.SetTarget(engineSpawn); 
+    camera.SetDistance(200.0f);
+    camera.SetRotation(-90.0f, 20.0f); // Look +X, slightly down 
+    
     // Mouse control state
     bool mousePressed = false;
     int lastMouseX = 0, lastMouseY = 0;
 
     // Lighting parameters
-    glm::vec3 lightPos(2.0f, 2.0f, 2.0f);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
     // Main loop
@@ -108,7 +142,6 @@ int main(int argc, char* argv[]) {
     // Time management
     Uint64 lastTime = SDL_GetPerformanceCounter();
     double deltaTime = 0.0;
-    float rotation = 0.0f;
 
     // Game Loop
     while (!quit) {
@@ -118,7 +151,7 @@ int main(int argc, char* argv[]) {
         deltaTime /= 1000.0; // Convert to seconds
         lastTime = currentTime;
 
-        // FPS Counter (display every second)
+        // FPS Counter
         static float fpsTimer = 0.0f;
         static int frameCount = 0;
         fpsTimer += deltaTime;
@@ -180,9 +213,6 @@ int main(int argc, char* argv[]) {
         }
 
         // Update
-        rotation += deltaTime * 45.0f; // 45 degrees per second
-        if (rotation >= 360.0f) rotation -= 360.0f;
-
         camera.Update(deltaTime);
 
         // Render
@@ -192,32 +222,28 @@ int main(int argc, char* argv[]) {
         shader.Use();
 
         // Set uniforms
-        // Model matrix (rotate cube)
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-        shader.SetMat4("uModel", model);
-
-        // View and projection matrices
         shader.SetMat4("uView", camera.GetViewMatrix());
         shader.SetMat4("uProjection", camera.GetProjectionMatrix());
 
-        // Lighting uniforms
         shader.SetVec3("uLightPos", lightPos);
         shader.SetVec3("uLightColor", lightColor);
         shader.SetVec3("uViewPos", camera.GetPosition());
-        shader.SetFloat("uAmbientStrength", 0.2f);
+        shader.SetFloat("uAmbientStrength", 0.5f);
         shader.SetFloat("uSpecularStrength", 0.5f);
         shader.SetFloat("uShininess", 32.0f);
 
-        // Material color
+        // Set texture sampler to use texture unit 0
+        shader.SetInt("uTexture", 0);
+        
         shader.SetVec3("uColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-        // Bind texture
-        shader.SetInt("uTexture", 0);
-        texture.Bind(0);
-
-        // Draw cube
-        cube.Draw(shader);
+        // Render world with rotation (Quake Z-up to Engine Y-up)
+        glm::mat4 worldModel = glm::mat4(1.0f);
+        worldModel = glm::rotate(worldModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        shader.SetMat4("uModel", worldModel);
+        
+        // World handles texture binding now
+        world.Render(shader);
 
         // Swap buffers
         renderer.SwapBuffers(window);

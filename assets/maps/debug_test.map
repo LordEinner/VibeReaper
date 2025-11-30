@@ -1,0 +1,49 @@
+// Game: VibeReaper
+// Format: Standard
+// entity 0
+{
+"classname" "worldspawn"
+"message" "Debug Test Map"
+"worldtype" "0"
+"light" "200"
+// brush 0
+{
+( -256 -256 -16 ) ( -256 -255 -16 ) ( -256 -256 -15 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+( -256 -256 -16 ) ( -256 -256 -15 ) ( -255 -256 -16 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+( -256 -256 -16 ) ( -255 -256 -16 ) ( -256 -255 -16 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+( 256 256 0 ) ( 256 257 0 ) ( 257 256 0 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+( 256 256 0 ) ( 257 256 0 ) ( 256 256 1 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+( 256 256 0 ) ( 256 256 1 ) ( 256 257 0 ) urban/floor_cobblestone 0 0 0 0.5 0.5
+}
+// brush 1
+{
+( 64 64 0 ) ( 64 65 0 ) ( 64 64 1 ) urban/wall_brick 0 0 90 0.125 0.125
+( 64 64 0 ) ( 64 64 1 ) ( 65 64 0 ) urban/wall_brick 0 0 90 0.125 0.125
+( 64 64 0 ) ( 65 64 0 ) ( 64 65 0 ) urban/wall_brick 0 0 90 0.125 0.125
+( 128 128 64 ) ( 128 129 64 ) ( 129 128 64 ) urban/wall_brick 0 0 90 0.125 0.125
+( 128 128 64 ) ( 129 128 64 ) ( 128 128 65 ) urban/wall_brick 0 0 90 0.125 0.125
+( 128 128 64 ) ( 128 128 65 ) ( 128 129 64 ) urban/wall_brick 0 0 90 0.125 0.125
+}
+// brush 2
+{
+( -128 -128 0 ) ( -128 -127 0 ) ( -128 -128 1 ) urban/wall_brick 0 0 0 1 1
+( -128 -128 0 ) ( -128 -128 1 ) ( -127 -128 0 ) urban/wall_brick 0 0 0 1 1
+( -128 -128 0 ) ( -127 -128 0 ) ( -128 -127 0 ) urban/wall_brick 0 0 0 1 1
+( -64 -64 64 ) ( -64 -63 64 ) ( -63 -64 64 ) urban/wall_brick 0 0 0 1 1
+( -64 -64 64 ) ( -63 -64 64 ) ( -64 -64 65 ) urban/wall_brick 0 0 0 1 1
+( -64 -64 64 ) ( -64 -64 65 ) ( -64 -63 64 ) urban/wall_brick 0 0 0 1 1
+}
+}
+// entity 1
+{
+"classname" "info_player_start"
+"origin" "0 0 32"
+"angle" "90"
+}
+// entity 2
+{
+"classname" "light"
+"origin" "0 0 128"
+"light" "300"
+"style" "0"
+}

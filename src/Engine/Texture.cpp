@@ -14,6 +14,41 @@ namespace VibeReaper {
         Cleanup();
     }
 
+    Texture::Texture(Texture&& other) noexcept
+        : textureID(other.textureID),
+          width(other.width),
+          height(other.height),
+          channels(other.channels),
+          loaded(other.loaded) {
+        
+        // Reset other
+        other.textureID = 0;
+        other.width = 0;
+        other.height = 0;
+        other.channels = 0;
+        other.loaded = false;
+    }
+
+    Texture& Texture::operator=(Texture&& other) noexcept {
+        if (this != &other) {
+            Cleanup(); // Clean up existing resources
+
+            textureID = other.textureID;
+            width = other.width;
+            height = other.height;
+            channels = other.channels;
+            loaded = other.loaded;
+
+            // Reset other
+            other.textureID = 0;
+            other.width = 0;
+            other.height = 0;
+            other.channels = 0;
+            other.loaded = false;
+        }
+        return *this;
+    }
+
     bool Texture::LoadFromFile(const std::string& path) {
         if (loaded) {
             LOG_WARNING("Texture already loaded, cleaning up first");
@@ -51,8 +86,8 @@ namespace VibeReaper {
         // Set texture parameters
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // Free image data
         stbi_image_free(data);
@@ -64,6 +99,33 @@ namespace VibeReaper {
                  std::to_string(height) + ", " + std::to_string(channels) + " channels)");
 
         return true;
+    }
+
+    void Texture::CreateWhiteTexture() {
+        if (loaded) {
+            Cleanup();
+        }
+
+        width = 1;
+        height = 1;
+        channels = 4;
+
+        unsigned char data[] = { 255, 255, 255, 255 };
+
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        loaded = true;
+        LOG_INFO("Created fallback white texture");
     }
 
     void Texture::Bind(int textureUnit) {

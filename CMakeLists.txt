@@ -10,6 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Add our library includes
 include_directories(
     ${CMAKE_SOURCE_DIR}/lib/glad/include
+    ${CMAKE_SOURCE_DIR}/lib/glm
     ${CMAKE_SOURCE_DIR}/lib
     ${CMAKE_SOURCE_DIR}/src
 )
@@ -58,6 +59,13 @@ add_custom_command(TARGET VibeReaper POST_BUILD
     ${CMAKE_SOURCE_DIR}/assets
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
     COMMENT "Copying assets to binary directory..."
+)
+
+# Validate .map files exist
+add_custom_command(TARGET VibeReaper PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "Checking for .map files in assets/maps..."
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/assets/maps
+    COMMENT "Validating map file directory..."
 )
 
 # ============================================================================

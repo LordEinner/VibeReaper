@@ -21,6 +21,7 @@ bool Renderer::Initialize() {
     glDepthFunc(GL_LESS);
 
     // Enable face culling (don't render back faces)
+    // glDisable(GL_CULL_FACE); // DEBUG: Disable culling to see if geometry exists
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW); // Counter-clockwise winding order for front faces

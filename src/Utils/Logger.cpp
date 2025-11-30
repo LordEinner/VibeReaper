@@ -41,8 +41,8 @@ void Logger::Warning(const std::string& message) {
     Log(LogLevel::WARNING, message);
 }
 
-void Logger::Error(const std::string& message) {
-    Log(LogLevel::ERROR, message);
+void Logger::LogError(const std::string& message) {
+    Log(LogLevel::ERR, message);
 }
 
 void Logger::SetConsoleOutput(bool enabled) {
@@ -63,7 +63,7 @@ std::string Logger::LevelToString(LogLevel level) const {
         case LogLevel::DEBUG:   return "DEBUG";
         case LogLevel::INFO:    return "INFO";
         case LogLevel::WARNING: return "WARNING";
-        case LogLevel::ERROR:   return "ERROR";
+        case LogLevel::ERR:   return "ERROR";
         default:                return "UNKNOWN";
     }
 }
@@ -74,7 +74,7 @@ std::string Logger::GetColorCode(LogLevel level) const {
         case LogLevel::DEBUG:   return "\033[36m"; // Cyan
         case LogLevel::INFO:    return "\033[32m"; // Green
         case LogLevel::WARNING: return "\033[33m"; // Yellow
-        case LogLevel::ERROR:   return "\033[31m"; // Red
+        case LogLevel::ERR:   return "\033[31m"; // Red
         default:                return "\033[0m";  // Reset
     }
 }

@@ -2,6 +2,7 @@
 #include "../Utils/Logger.h"
 #include <glm/gtc/constants.hpp>
 #include <cmath>
+#include <utility>
 
 namespace VibeReaper {
 
@@ -15,6 +16,41 @@ namespace VibeReaper {
 
     Mesh::~Mesh() {
         Cleanup();
+    }
+
+    Mesh::Mesh(Mesh&& other) noexcept
+        : vertices(std::move(other.vertices)),
+          indices(std::move(other.indices)),
+          VAO(other.VAO),
+          VBO(other.VBO),
+          EBO(other.EBO),
+          isSetup(other.isSetup) {
+        
+        // Reset other
+        other.VAO = 0;
+        other.VBO = 0;
+        other.EBO = 0;
+        other.isSetup = false;
+    }
+
+    Mesh& Mesh::operator=(Mesh&& other) noexcept {
+        if (this != &other) {
+            Cleanup(); // Clean up existing resources
+
+            vertices = std::move(other.vertices);
+            indices = std::move(other.indices);
+            VAO = other.VAO;
+            VBO = other.VBO;
+            EBO = other.EBO;
+            isSetup = other.isSetup;
+
+            // Reset other
+            other.VAO = 0;
+            other.VBO = 0;
+            other.EBO = 0;
+            other.isSetup = false;
+        }
+        return *this;
     }
 
     void Mesh::SetupMesh() {

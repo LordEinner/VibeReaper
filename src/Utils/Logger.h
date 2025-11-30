@@ -14,7 +14,7 @@ enum class LogLevel {
     DEBUG,
     INFO,
     WARNING,
-    ERROR
+    ERR
 };
 
 class Logger {
@@ -29,7 +29,7 @@ public:
     void Debug(const std::string& message);
     void Info(const std::string& message);
     void Warning(const std::string& message);
-    void Error(const std::string& message);
+    void LogError(const std::string& message);
 
     // Enable/disable console output
     void SetConsoleOutput(bool enabled);
@@ -55,4 +55,4 @@ private:
 #define LOG_DEBUG(msg) VibeReaper::Logger::GetInstance().Debug(msg)
 #define LOG_INFO(msg) VibeReaper::Logger::GetInstance().Info(msg)
 #define LOG_WARNING(msg) VibeReaper::Logger::GetInstance().Warning(msg)
-#define LOG_ERROR(msg) VibeReaper::Logger::GetInstance().Error(msg)
+#define LOG_ERROR(msg) VibeReaper::Logger::GetInstance().LogError(msg)

@@ -1,0 +1,112 @@
+// VibeReaper Entity Definitions for TrenchBroom
+// Based on Quake FGD format
+
+@SolidClass = worldspawn : "World entity"
+[
+    message(string) : "Level name"
+    worldtype(choices) : "World type" : 0 =
+    [
+        0 : "Medieval"
+        1 : "Metal"
+        2 : "Base"
+    ]
+    sounds(choices) : "CD track" : 0 =
+    [
+        0 : "No music"
+        1 : "Track 1"
+        2 : "Track 2"
+        3 : "Track 3"
+    ]
+    light(integer) : "Default light level" : 0
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) color(0 255 0) = info_player_start : "Player spawn point"
+[
+    angle(integer) : "Direction" : 0
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) color(0 255 0) = info_player_deathmatch : "Deathmatch spawn"
+[
+    angle(integer) : "Direction" : 0
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) color(255 255 0) = light : "Light source"
+[
+    light(integer) : "Brightness" : 300
+    style(choices) : "Light style" : 0 =
+    [
+        0 : "Normal"
+        1 : "Flicker A"
+        2 : "Slow strong pulse"
+        3 : "Candle A"
+        4 : "Fast strobe"
+        5 : "Gentle pulse"
+        6 : "Flicker B"
+        7 : "Candle B"
+        8 : "Candle C"
+        9 : "Slow strobe"
+        10 : "Fluorescent flicker"
+        11 : "Slow pulse, no black"
+    ]
+    targetname(string) : "Name"
+    target(string) : "Target"
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) color(255 0 0) = item_health : "Health pickup"
+[
+    spawnflags(flags) =
+    [
+        1 : "Suspended" : 0
+        2 : "Rotating" : 0
+    ]
+]
+
+@PointClass size(-16 -16 -16, 16 16 16) color(255 128 0) = item_weapon : "Weapon pickup"
+[
+    weapon_type(choices) : "Weapon type" : 0 =
+    [
+        0 : "Pistol"
+        1 : "Shotgun"
+        2 : "Rifle"
+        3 : "Rocket Launcher"
+    ]
+]
+
+@PointClass size(-16 -16 0, 16 16 32) color(255 0 255) = enemy_grunt : "Enemy grunt"
+[
+    angle(integer) : "Direction" : 0
+    health(integer) : "Health" : 100
+]
+
+@SolidClass = func_wall : "Static wall"
+[
+    _minlight(string) : "Minimum light level"
+]
+
+@SolidClass = func_door : "Sliding door"
+[
+    angle(integer) : "Direction" : 0
+    speed(integer) : "Speed" : 100
+    sounds(choices) : "Sound" : 0 =
+    [
+        0 : "Silent"
+        1 : "Stone"
+        2 : "Metal"
+        3 : "Wood"
+    ]
+    targetname(string) : "Name"
+    target(string) : "Target"
+]
+
+@PointClass size(-8 -8 -8, 8 8 8) = trigger_once : "Trigger (fires once)"
+[
+    target(string) : "Target"
+    message(string) : "Message"
+]
+
+@SolidClass = trigger_multiple : "Trigger (fires multiple times)"
+[
+    target(string) : "Target"
+    message(string) : "Message"
+    wait(string) : "Wait time" : "0.2"
+]

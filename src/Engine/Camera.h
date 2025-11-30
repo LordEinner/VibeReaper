@@ -22,6 +22,7 @@ namespace VibeReaper {
         // Setters
         void SetAspectRatio(float aspect);
         void SetDistance(float distValue);
+        void SetRotation(float yaw, float pitch);
 
         // Getters
         glm::vec3 GetPosition() const { return position; }
