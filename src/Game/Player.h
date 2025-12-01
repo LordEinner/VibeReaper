@@ -49,11 +49,9 @@ namespace VibeReaper {
         glm::vec3 GetVelocity() const { return velocity; }
         float GetYaw() const { return yaw; }
         glm::vec3 GetForward() const;
-        bool IsGrounded() const { return isGrounded; }
 
         // Setters
         void SetPosition(const glm::vec3& pos) { position = pos; }
-        void SetGrounded(bool grounded) { isGrounded = grounded; }
 
         // Player dimensions (for collision)
         // Human size: 0.8m × 1.75m (using _u literal for elegant meter-to-MAP-unit conversion)
@@ -67,14 +65,8 @@ namespace VibeReaper {
         float yaw;   // Horizontal rotation (radians)
         float pitch; // Vertical look angle (for future animation)
 
-        // Physics
-        bool isGrounded;
-        float moveSpeed;
-        float jumpStrength;
-        float gravity;
-        float terminalVelocity;
-
-        // Movement tuning
+        // Movement parameters
+        float moveSpeed;          // Units per second
         float acceleration;       // Time to reach full speed
         float rotationSpeed;      // Radians per second
 

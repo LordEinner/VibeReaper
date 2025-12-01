@@ -135,7 +135,6 @@ int main(int argc, char* argv[]) {
     // Create player at spawn position
     Player player;
     player.SetPosition(engineSpawn);
-    player.SetGrounded(true);
 
     // Create input system
     Input input;
@@ -262,7 +261,7 @@ int main(int argc, char* argv[]) {
         // Camera follow player center (half of player height: 1.75m / 2 = 0.875m)
         const float playerCenterHeight = 0.875_u;  // 1.75m / 2
         glm::vec3 playerCenter = player.GetPosition() + glm::vec3(0.0f, playerCenterHeight, 0.0f);
-        camera.FollowTarget(playerCenter, deltaTime);
+        camera.FollowTargetWithCollision(playerCenter, &world, deltaTime);
         camera.Update(deltaTime);
 
         // Render

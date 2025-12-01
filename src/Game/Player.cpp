@@ -12,11 +12,7 @@ namespace VibeReaper {
           velocity(0.0f, 0.0f, 0.0f),
           yaw(0.0f),
           pitch(0.0f),
-          isGrounded(false),
           moveSpeed(5.0_u),           // 5 m/s walking speed
-          jumpStrength(8.0_u),        // 8 m/s upward jump velocity
-          gravity(-20.0_u),           // -20 m/s² gravity
-          terminalVelocity(-50.0_u),  // -50 m/s max fall speed
           acceleration(0.15f),        // Time to reach full speed
           rotationSpeed(12.0f),       // Radians per second
           movementInput(0.0f, 0.0f),
