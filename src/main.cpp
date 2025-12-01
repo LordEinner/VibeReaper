@@ -258,6 +258,14 @@ int main(int argc, char* argv[]) {
             camera.Zoom(-5.0f * deltaTime);
         }
 
+        // Debug logging (on-demand)
+        if (input.IsKeyJustPressed(SDL_SCANCODE_SPACE)) {
+            camera.LogDebugInfo(&world, false); // Spacebar = system working incorrectly
+        }
+        if (input.IsKeyJustPressed(SDL_SCANCODE_RETURN)) {
+            camera.LogDebugInfo(&world, true);  // Enter = system working correctly
+        }
+
         // Camera follow player center (half of player height: 1.75m / 2 = 0.875m)
         const float playerCenterHeight = 0.875_u;  // 1.75m / 2
         glm::vec3 playerCenter = player.GetPosition() + glm::vec3(0.0f, playerCenterHeight, 0.0f);

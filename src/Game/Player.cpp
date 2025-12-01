@@ -72,8 +72,13 @@ namespace VibeReaper {
         }
 
         // Create model matrix
+        // Position player so feet are at y=0 (position), top at y=HEIGHT
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, position);
+
+        // Translate to player position, then offset up by half height
+        // This puts the mesh center at position + HEIGHT/2, with bottom at position
+        glm::vec3 renderPos = position + glm::vec3(0.0f, HEIGHT * 0.5f, 0.0f);
+        model = glm::translate(model, renderPos);
         model = glm::rotate(model, yaw, glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(WIDTH * 0.5f, HEIGHT * 0.5f, WIDTH * 0.5f));
 
