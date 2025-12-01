@@ -15,6 +15,7 @@ namespace VibeReaper {
 
         // Camera controls
         void SetTarget(const glm::vec3& target);
+        void FollowTarget(const glm::vec3& targetPos, float deltaTime);
         void Orbit(float deltaYaw, float deltaPitch);
         void Zoom(float delta);
         void Update(float deltaTime);

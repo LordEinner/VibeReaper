@@ -9,8 +9,39 @@
 #include "Engine/Mesh.h"
 #include "Engine/Texture.h"
 #include "Engine/Camera.h"
+#include "Engine/Input.h"
+#include "Engine/Constants.h"
 #include "Utils/Logger.h"
 #include "Game/World.h"
+#include "Game/Player.h"
+
+using namespace VibeReaper;
+
+/**
+ * SCALE SYSTEM DOCUMENTATION
+ *
+ * This project uses a configurable scale between Quake MAP units and real-world meters.
+ * The conversion ratio is defined in Engine/Constants.h as MAP_UNITS_PER_METER.
+ *
+ * Current setting: 64 MAP units = 1 meter
+ *
+ * USER-DEFINED LITERAL: _u
+ * Use the '_u' suffix to write measurements in meters that automatically convert to MAP units.
+ *
+ * Examples:
+ * - Player height: 1.75_u    → 112.0 MAP units (1.75m × 64)
+ * - Camera distance: 5.0_u   → 320.0 MAP units (5m × 64)
+ * - Movement speed: 5.5_u    → 352.0 MAP units/sec (5.5 m/s × 64)
+ *
+ * This provides clean, readable code while maintaining the scale abstraction.
+ * Changing MAP_UNITS_PER_METER automatically updates all _u measurements.
+ *
+ * This scale is applied throughout the engine for:
+ * - Player dimensions (0.8m × 1.75m human size)
+ * - Movement speeds (5 m/s walking speed)
+ * - Camera distances (5m third-person offset)
+ * - Physics values (gravity, jump strength, etc.)
+ */
 
 // Screen dimensions
 const int SCREEN_WIDTH = 1280;
@@ -65,7 +96,7 @@ int main(int argc, char* argv[]) {
     LOG_INFO("Renderer: " + std::string((char*)glGetString(GL_RENDERER)));
 
     // Initialize Renderer
-    VibeReaper::Renderer renderer;
+    Renderer renderer;
     if (!renderer.Initialize()) {
         LOG_ERROR("Failed to initialize Renderer");
         return -1;
@@ -73,24 +104,21 @@ int main(int argc, char* argv[]) {
     renderer.SetViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     // Load lighting shader
-    VibeReaper::Shader shader;
+    Shader shader;
     if (!shader.LoadFromFiles("assets/shaders/lighting.vert", "assets/shaders/lighting.frag")) {
         LOG_ERROR("Failed to load lighting shaders");
         return -1;
     }
 
-    // Create mesh (procedural cube)
-    VibeReaper::Mesh cube = VibeReaper::Mesh::GenerateCube();
-
     // Load texture
-    VibeReaper::Texture texture;
+    Texture texture;
     if (!texture.LoadFromFile("assets/textures/test_texture.png")) {
         LOG_WARNING("Failed to load test texture, creating fallback white texture");
         texture.CreateWhiteTexture();
     }
 
     // Load world from MAP file
-    VibeReaper::World world;
+    World world;
     if (!world.LoadMap("assets/maps/debug_test.map")) {
         LOG_ERROR("Failed to load map, exiting");
         return -1;
@@ -100,13 +128,22 @@ int main(int argc, char* argv[]) {
     glm::vec3 playerSpawn = world.GetPlayerSpawnPosition();
     // Transform spawn position from Z-up to Y-up: (x, y, z) -> (x, z, -y)
     glm::vec3 engineSpawn(playerSpawn.x, playerSpawn.z, -playerSpawn.y);
-    
-    LOG_INFO("Player spawn (Engine): " + std::to_string(engineSpawn.x) + ", " + 
+
+    LOG_INFO("Player spawn (Engine): " + std::to_string(engineSpawn.x) + ", " +
              std::to_string(engineSpawn.y) + ", " + std::to_string(engineSpawn.z));
+
+    // Create player at spawn position
+    Player player;
+    player.SetPosition(engineSpawn);
+    player.SetGrounded(true);
+
+    // Create input system
+    Input input;
+    input.SetMouseCaptured(true); // Capture mouse for camera control
 
     // Get light position from map (assuming first light found)
     glm::vec3 lightPos(0.0f, 500.0f, 0.0f); // Default high above
-    std::vector<const VibeReaper::Entity*> lights = world.GetEntitiesByClass("light");
+    std::vector<const Entity*> lights = world.GetEntitiesByClass("light");
     if (!lights.empty()) {
         glm::vec3 mapLightPos = lights[0]->GetOrigin();
         // Transform light position from Z-up to Y-up
@@ -121,16 +158,15 @@ int main(int argc, char* argv[]) {
 
     // Create camera
     float aspectRatio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
-    VibeReaper::Camera camera(45.0f, aspectRatio, 0.1f, 4000.0f);
-    
-    // Set camera to look +X
-    camera.SetTarget(engineSpawn); 
-    camera.SetDistance(200.0f);
-    camera.SetRotation(-90.0f, 20.0f); // Look +X, slightly down 
-    
-    // Mouse control state
-    bool mousePressed = false;
-    int lastMouseX = 0, lastMouseY = 0;
+    Camera camera(45.0f, aspectRatio, 0.1f, 4000.0f);
+
+    // Set camera to orbit player (third-person)
+    // Target player's center (half of player height: 1.75m / 2 = 0.875m)
+    const float playerCenterHeight = 0.875_u;  // 1.75m / 2
+    glm::vec3 playerCenter = engineSpawn + glm::vec3(0.0f, playerCenterHeight, 0.0f);
+    camera.SetTarget(playerCenter);
+    camera.SetDistance(5.0_u);  // 5 meters behind player
+    camera.SetRotation(0.0f, 20.0f); // Behind player, slightly elevated
 
     // Lighting parameters
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -156,7 +192,7 @@ int main(int argc, char* argv[]) {
         static int frameCount = 0;
         fpsTimer += deltaTime;
         frameCount++;
-        
+
         if (fpsTimer >= 1.0f) {
             float fps = frameCount / fpsTimer;
             LOG_INFO("FPS: " + std::to_string((int)fps));
@@ -166,9 +202,12 @@ int main(int argc, char* argv[]) {
 
         // Handle Events
         while (SDL_PollEvent(&e) != 0) {
+            // Process input events
+            input.ProcessEvent(e);
+
             if (e.type == SDL_QUIT) {
                 quit = true;
-            } 
+            }
             else if (e.type == SDL_WINDOWEVENT) {
                 if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
                     int width = e.window.data1;
@@ -176,43 +215,54 @@ int main(int argc, char* argv[]) {
                     renderer.SetViewport(0, 0, width, height);
                     camera.SetAspectRatio((float)width / (float)height);
                 }
-            } 
+            }
             else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_ESCAPE) {
                     quit = true;
                 }
             }
-            else if (e.type == SDL_MOUSEBUTTONDOWN) {
-                if (e.button.button == SDL_BUTTON_LEFT) {
-                    mousePressed = true;
-                    SDL_GetMouseState(&lastMouseX, &lastMouseY);
-                }
-            }
-            else if (e.type ==SDL_MOUSEBUTTONUP) {
-                if (e.button.button == SDL_BUTTON_LEFT) {
-                    mousePressed = false;
-                }
-            }
-            else if (e.type == SDL_MOUSEMOTION) {
-                if (mousePressed) {
-                    int mouseX, mouseY;
-                    SDL_GetMouseState(&mouseX, &mouseY);
-                    
-                    float deltaX = (float)(mouseX - lastMouseX);
-                    float deltaY = (float)(mouseY - lastMouseY);
-                    
-                    camera.Orbit(deltaX * 0.25f, -deltaY * 0.25f);
-                    
-                    lastMouseX = mouseX;
-                    lastMouseY = mouseY;
-                }
-            }
-            else if (e.type == SDL_MOUSEWHEEL) {
-                camera.Zoom((float)e.wheel.y * 0.5f);
+        }
+
+        // Update input state
+        input.Update();
+
+        // Process player input
+        player.ProcessInput(input, camera, deltaTime);
+
+        // Update player physics
+        player.Update(deltaTime);
+
+        // Camera rotation via mouse
+        glm::vec2 mouseDelta = input.GetMouseDelta();
+        if (glm::length(mouseDelta) > 0.01f) {
+            float horizontalMult = input.GetInvertHorizontal() ? -1.0f : 1.0f;
+            float verticalMult = input.GetInvertVertical() ? -1.0f : 1.0f;
+            camera.Orbit(mouseDelta.x * 0.15f * horizontalMult, mouseDelta.y * 0.15f * verticalMult);
+        }
+
+        // Camera rotation via gamepad right stick
+        if (input.IsGamepadConnected()) {
+            float rightX = input.GetAxis(SDL_CONTROLLER_AXIS_RIGHTX);
+            float rightY = input.GetAxis(SDL_CONTROLLER_AXIS_RIGHTY);
+            if (std::abs(rightX) > 0.01f || std::abs(rightY) > 0.01f) {
+                float horizontalMult = input.GetInvertHorizontal() ? -1.0f : 1.0f;
+                float verticalMult = input.GetInvertVertical() ? -1.0f : 1.0f;
+                camera.Orbit(rightX * 3.0f * horizontalMult, rightY * 3.0f * verticalMult);
             }
         }
 
-        // Update
+        // Camera zoom
+        if (input.IsKeyPressed(SDL_SCANCODE_EQUALS)) {
+            camera.Zoom(5.0f * deltaTime);
+        }
+        if (input.IsKeyPressed(SDL_SCANCODE_MINUS)) {
+            camera.Zoom(-5.0f * deltaTime);
+        }
+
+        // Camera follow player center (half of player height: 1.75m / 2 = 0.875m)
+        const float playerCenterHeight = 0.875_u;  // 1.75m / 2
+        glm::vec3 playerCenter = player.GetPosition() + glm::vec3(0.0f, playerCenterHeight, 0.0f);
+        camera.FollowTarget(playerCenter, deltaTime);
         camera.Update(deltaTime);
 
         // Render
@@ -241,9 +291,12 @@ int main(int argc, char* argv[]) {
         glm::mat4 worldModel = glm::mat4(1.0f);
         worldModel = glm::rotate(worldModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         shader.SetMat4("uModel", worldModel);
-        
+
         // World handles texture binding now
         world.Render(shader);
+
+        // Render player (no world rotation needed - player is already in engine space)
+        player.Render(shader);
 
         // Swap buffers
         renderer.SwapBuffers(window);

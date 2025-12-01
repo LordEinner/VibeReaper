@@ -202,37 +202,52 @@ namespace VibeReaper {
     }
 
     glm::vec2 BrushConverter::CalculateUV(const glm::vec3& vertex, const Plane& plane) {
-        // Simple planar projection
-        // Create texture axes perpendicular to normal
+        // Planar projection for texture mapping
+        // Vertices and normals are in Quake Z-up coordinate system
 
-        glm::vec3 up = std::abs(plane.normal.y) < 0.9f ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
-        glm::vec3 uAxis = glm::normalize(glm::cross(up, plane.normal));
-        glm::vec3 vAxis = glm::cross(plane.normal, uAxis);
+        // Determine texture axes based on dominant normal direction
+        glm::vec3 uAxis, vAxis;
+        glm::vec3 absNormal = glm::abs(plane.normal);
 
-        // Project vertex onto texture axes
-        // In Quake, scale represents "world units per texture pixel"
-        // So we need to MULTIPLY (not divide) to get proper tiling
-        float u = glm::dot(vertex, uAxis) * plane.scaleX;
-        float v = glm::dot(vertex, vAxis) * plane.scaleY;
+        // Choose axes based on which component of normal is largest
+        if (absNormal.z > absNormal.x && absNormal.z > absNormal.y) {
+            // Floor/ceiling (Z-dominant) - map X to U, Y to V
+            uAxis = glm::vec3(1, 0, 0);
+            vAxis = glm::vec3(0, -1, 0);  // Negate Y for correct orientation
+        } else if (absNormal.y > absNormal.x) {
+            // North/South wall (Y-dominant) - map X to U, Z to V
+            uAxis = glm::vec3(1, 0, 0);
+            vAxis = glm::vec3(0, 0, -1);  // Negate Z for correct orientation
+        } else {
+            // East/West wall (X-dominant) - map Y to U, Z to V
+            uAxis = glm::vec3(0, 1, 0);
+            vAxis = glm::vec3(0, 0, -1);  // Negate Z for correct orientation
+        }
 
-        // Apply rotation (convert degrees to radians, negate for Quake convention)
-        float rotationRad = glm::radians(-plane.rotation);
-        float cosRot = std::cos(rotationRad);
-        float sinRot = std::sin(rotationRad);
-        
-        // Rotate UV coordinates around origin
-        float uRotated = u * cosRot - v * sinRot;
-        float vRotated = u * sinRot + v * cosRot;
-        
-        // Apply offset
-        uRotated += plane.offsetX;
-        vRotated += plane.offsetY;
+        // Project vertex onto texture axes and apply scale
+        // TrenchBroom scale formula: UV = (position × scale) / 64
+        // Where 64 is Quake's reference texture size
+        // With scale 0.25 and 256px texture: 64 units × 0.25 / 64 = 0.25, then scaled by (256/64)=4 → 1.0
+        float u = glm::dot(vertex, uAxis) * plane.scaleX / 64.0f;
+        float v = glm::dot(vertex, vAxis) * plane.scaleY / 64.0f;
 
-        // Normalize to texture coordinates (assuming 64x64 default texture size from Quake)
-        uRotated /= 64.0f;
-        vRotated /= 64.0f;
+        // Apply offset (offset is in texture pixels, so scale by reference texture size)
+        u += plane.offsetX / 64.0f;
+        v += plane.offsetY / 64.0f;
 
-        return glm::vec2(uRotated, vRotated);
+        // Apply rotation
+        if (std::abs(plane.rotation) > 0.01f) {
+            float rotationRad = glm::radians(plane.rotation);
+            float cosRot = std::cos(rotationRad);
+            float sinRot = std::sin(rotationRad);
+
+            float uRotated = u * cosRot - v * sinRot;
+            float vRotated = u * sinRot + v * cosRot;
+            u = uRotated;
+            v = vRotated;
+        }
+
+        return glm::vec2(u, v);
     }
 
     std::vector<unsigned int> BrushConverter::TriangulateFace(unsigned int startIndex, unsigned int vertexCount) {

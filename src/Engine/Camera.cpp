@@ -25,6 +25,15 @@ namespace VibeReaper {
         UpdatePosition();
     }
 
+    void Camera::FollowTarget(const glm::vec3& targetPos, float deltaTime) {
+        // Smoothly lerp target position toward player position
+        const float lerpFactor = 0.1f;
+        float smoothFactor = 1.0f - pow(1.0f - lerpFactor, deltaTime * 60.0f);
+
+        target = glm::mix(target, targetPos, smoothFactor);
+        UpdatePosition();
+    }
+
     void Camera::Orbit(float deltaYaw, float deltaPitch) {
         yaw += deltaYaw;
         pitch += deltaPitch;
