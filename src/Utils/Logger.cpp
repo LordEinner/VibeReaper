@@ -9,23 +9,38 @@ Logger& Logger::GetInstance() {
 
 Logger::Logger() : m_consoleOutput(true) {
     // Constructor - logger starts with console output enabled
+    // Open log file for writing
+    m_logFile.open("VibeReaper.log", std::ios::out | std::ios::trunc);
+    if (m_logFile.is_open()) {
+        m_logFile << "=== VibeReaper Log Started ===" << std::endl;
+    }
 }
 
 Logger::~Logger() {
     // Destructor
+    if (m_logFile.is_open()) {
+        m_logFile << "=== VibeReaper Log Ended ===" << std::endl;
+        m_logFile.close();
+    }
 }
 
 void Logger::Log(LogLevel level, const std::string& message) {
     std::string timestamp = GetTimestamp();
     std::string levelStr = LevelToString(level);
     std::string colorCode = GetColorCode(level);
-    
+
     // Format: [TIMESTAMP] [LEVEL] Message
     std::string formattedMessage = "[" + timestamp + "] [" + levelStr + "] " + message;
 
     if (m_consoleOutput) {
         // Output to console with color (Windows console supports ANSI colors in Win10+)
         std::cout << colorCode << formattedMessage << "\033[0m" << std::endl;
+    }
+
+    // Always write to log file
+    if (m_logFile.is_open()) {
+        m_logFile << formattedMessage << std::endl;
+        m_logFile.flush(); // Flush immediately so logs are written even if crash occurs
     }
 }
 

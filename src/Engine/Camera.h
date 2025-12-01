@@ -5,6 +5,9 @@
 
 namespace VibeReaper {
 
+    // Forward declarations
+    class World;
+
     class Camera {
     public:
         Camera(float fov = 45.0f, float aspect = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 100.0f);
@@ -15,6 +18,8 @@ namespace VibeReaper {
 
         // Camera controls
         void SetTarget(const glm::vec3& target);
+        void FollowTarget(const glm::vec3& targetPos, float deltaTime);
+        void FollowTargetWithCollision(const glm::vec3& targetPos, const World* world, float deltaTime);
         void Orbit(float deltaYaw, float deltaPitch);
         void Zoom(float delta);
         void Update(float deltaTime);
@@ -41,6 +46,8 @@ namespace VibeReaper {
         float yaw;     // Horizontal rotation
         float pitch;   // Vertical rotation
         float distFromTarget; // Distance from target
+        float desiredDistance; // Desired distance (before wall collision)
+        float currentDistance; // Current distance (after wall collision)
 
         // Projection parameters
         float fov;

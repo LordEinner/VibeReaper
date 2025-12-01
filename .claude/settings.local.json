@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(./build/bin/VibeReaper.exe:*)",
+      "Bash(VibeReaper.exe)",
+      "Bash(D:/Root/Gamedev/VibeReaper/build/bin/VibeReaper.exe)",
+      "Bash(cmake --build:*)"
     ],
     "deny": [],
     "ask": []
