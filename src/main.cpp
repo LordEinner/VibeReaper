@@ -199,6 +199,9 @@ int main(int argc, char* argv[]) {
             frameCount = 0;
         }
 
+        // Prepare input state (snapshot previous keyboard state)
+        input.Prepare();
+
         // Handle Events
         while (SDL_PollEvent(&e) != 0) {
             // Process input events
@@ -258,13 +261,9 @@ int main(int argc, char* argv[]) {
             camera.Zoom(-5.0f * deltaTime);
         }
 
-        // Debug logging (on-demand)
-        if (input.IsKeyJustPressed(SDL_SCANCODE_E)) {
-            camera.LogDebugInfo(&world, false); // E = system working incorrectly
-        }
-        if (input.IsKeyJustPressed(SDL_SCANCODE_Q)) {
-            camera.LogDebugInfo(&world, true);  // Q = system working correctly
-        }
+
+
+
 
         // Camera follow player center (half of player height: 1.75m / 2 = 0.875m)
         const float playerCenterHeight = 0.875_u;  // 1.75m / 2

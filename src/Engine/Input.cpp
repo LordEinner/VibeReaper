@@ -70,9 +70,16 @@ namespace VibeReaper {
         }
     }
 
-    void Input::Update() {
-        // Update keyboard state
+    void Input::Prepare() {
+        // Update keyboard state - MUST be done before SDL_PollEvent
+        // SDL_PollEvent updates the internal array returned by SDL_GetKeyboardState
+        // so we must copy it to previous BEFORE processing events
         std::memcpy(previousKeyState, currentKeyState, keyStateLength);
+    }
+
+    void Input::Update() {
+        // Keyboard state is already prepared in Prepare()
+        // Just ensure current pointer is valid (it points to internal SDL memory)
         currentKeyState = SDL_GetKeyboardState(nullptr);
 
         // Update mouse state

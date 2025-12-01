@@ -32,7 +32,13 @@ namespace VibeReaper {
         void ProcessEvent(const SDL_Event& event);
 
         /**
-         * @brief Update input state - call once at start of each frame
+         * @brief Prepare input state - call once BEFORE event loop
+         * Captures current state to previous state before SDL updates it
+         */
+        void Prepare();
+
+        /**
+         * @brief Update input state - call once AFTER event loop
          */
         void Update();
 

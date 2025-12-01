@@ -36,9 +36,6 @@ namespace VibeReaper {
         float GetPitch() const { return pitch; }
         float GetDistance() const { return distFromTarget; }
 
-        // Debug
-        void LogDebugInfo(const World* world, bool isWorking) const;
-
     private:
         // Camera parameters
         glm::vec3 position;

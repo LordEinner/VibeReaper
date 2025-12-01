@@ -94,7 +94,15 @@ namespace VibeReaper {
                 if (dotProduct <= 0.0f) continue;
 
                 // Raycast against mesh AABB
-                CollisionResult hitResult = Collision::RaycastAABB(target, direction, meshAABB, desiredDistance);
+                // Offset start point slightly towards camera to avoid immediate collision with floor/player
+                glm::vec3 rayStart = target + direction * 0.1f;
+
+                // Transform ray to Quake space (Z-up) for collision detection
+                // Engine (Y-up) -> Quake (Z-up): (x, y, z) -> (x, -z, y)
+                glm::vec3 rayStartQuake(rayStart.x, -rayStart.z, rayStart.y);
+                glm::vec3 directionQuake(direction.x, -direction.z, direction.y);
+                
+                CollisionResult hitResult = Collision::RaycastAABB(rayStartQuake, directionQuake, meshAABB, desiredDistance);
                 if (hitResult.hit) {
                     float hitDistance = hitResult.penetration; // penetration stores the ray distance (t value)
                     if (hitDistance > 0.0f && hitDistance < minDistance) {
@@ -181,85 +189,6 @@ namespace VibeReaper {
         position = target + glm::vec3(x, y, z);
     }
 
-    void Camera::LogDebugInfo(const World* world, bool isWorking) const {
-        LOG_INFO("========================================");
-        LOG_INFO(isWorking ? "DEBUG: System WORKING CORRECTLY (Q key)" : "DEBUG: System WORKING INCORRECTLY (E key)");
-        LOG_INFO("========================================");
 
-        // Camera state
-        LOG_INFO("Camera State:");
-        LOG_INFO("  Position: (" + std::to_string(position.x) + ", " +
-                 std::to_string(position.y) + ", " + std::to_string(position.z) + ")");
-        LOG_INFO("  Target: (" + std::to_string(target.x) + ", " +
-                 std::to_string(target.y) + ", " + std::to_string(target.z) + ")");
-        LOG_INFO("  Yaw: " + std::to_string(yaw) + "°, Pitch: " + std::to_string(pitch) + "°");
-        LOG_INFO("  Desired distance: " + std::to_string(desiredDistance) + " units");
-        LOG_INFO("  Current distance: " + std::to_string(currentDistance) + " units");
-        LOG_INFO("  Actual distance from target: " + std::to_string(glm::length(position - target)) + " units");
-
-        // Camera direction
-        glm::vec3 direction = glm::normalize(position - target);
-        LOG_INFO("  Direction (from target to camera): (" + std::to_string(direction.x) + ", " +
-                 std::to_string(direction.y) + ", " + std::to_string(direction.z) + ")");
-
-        if (world) {
-            LOG_INFO("");
-            LOG_INFO("Nearby Geometry Analysis:");
-
-            const auto& geometry = world->GetLevelGeometry();
-            int meshIndex = 0;
-
-            for (const auto& renderObj : geometry) {
-                if (renderObj.mesh.vertices.empty()) continue;
-
-                // Calculate AABB
-                glm::vec3 bmin(FLT_MAX), bmax(-FLT_MAX);
-                for (const auto& vertex : renderObj.mesh.vertices) {
-                    bmin = glm::min(bmin, vertex.position);
-                    bmax = glm::max(bmax, vertex.position);
-                }
-
-                AABB meshAABB{bmin, bmax};
-                glm::vec3 aabbCenter = (meshAABB.min + meshAABB.max) * 0.5f;
-
-                // Distance from player to AABB center
-                float distanceToAABB = glm::length(aabbCenter - target);
-
-                // Direction to AABB
-                glm::vec3 toAABB = aabbCenter - target;
-                float dotProduct = glm::dot(glm::normalize(toAABB), direction);
-
-                // Only log nearby or relevant geometry
-                if (distanceToAABB < 1000.0f || dotProduct > 0.0f) {
-                    LOG_INFO("  Mesh #" + std::to_string(meshIndex) + ":");
-                    LOG_INFO("    AABB min: (" + std::to_string(bmin.x) + ", " +
-                             std::to_string(bmin.y) + ", " + std::to_string(bmin.z) + ")");
-                    LOG_INFO("    AABB max: (" + std::to_string(bmax.x) + ", " +
-                             std::to_string(bmax.y) + ", " + std::to_string(bmax.z) + ")");
-                    LOG_INFO("    Center: (" + std::to_string(aabbCenter.x) + ", " +
-                             std::to_string(aabbCenter.y) + ", " + std::to_string(aabbCenter.z) + ")");
-                    LOG_INFO("    Distance from player: " + std::to_string(distanceToAABB) + " units");
-                    LOG_INFO("    Dot product (direction alignment): " + std::to_string(dotProduct));
-                    LOG_INFO("    In camera direction: " + std::string(dotProduct > 0.0f ? "YES" : "NO"));
-
-                    // Try raycast
-                    CollisionResult hitResult = Collision::RaycastAABB(target, direction, meshAABB, desiredDistance);
-                    if (hitResult.hit) {
-                        LOG_INFO("    RAYCAST HIT:");
-                        LOG_INFO("      Hit distance: " + std::to_string(hitResult.penetration) + " units");
-                        LOG_INFO("      Hit point: (" + std::to_string(hitResult.contactPoint.x) + ", " +
-                                 std::to_string(hitResult.contactPoint.y) + ", " +
-                                 std::to_string(hitResult.contactPoint.z) + ")");
-                    } else {
-                        LOG_INFO("    Raycast: NO HIT");
-                    }
-                }
-
-                meshIndex++;
-            }
-        }
-
-        LOG_INFO("========================================");
-    }
 
 } // namespace VibeReaper
