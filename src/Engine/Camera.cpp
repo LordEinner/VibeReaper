@@ -67,36 +67,31 @@ namespace VibeReaper {
             float rayDistance = desiredDistance;
 
             // Check collision with world geometry
-            // For now, we'll use a simple sphere cast approach
-            // Cast a ray from target toward camera, check each brush AABB
+            // Cast a ray from player toward camera, check each mesh AABB
 
             float minDistance = rayDistance;
-            const float cameraRadius = 0.3f; // Small radius to avoid clipping
+            const float cameraRadius = 0.5_u; // Small radius to avoid clipping (0.5m)
 
-            for (const auto& brush : world->GetWorldspawn()->brushes) {
-                // Create AABB for brush (simplified - using first plane bounds)
-                if (brush.planes.empty()) continue;
+            const auto& geometry = world->GetLevelGeometry();
+            for (const auto& renderObj : geometry) {
+                // Calculate AABB from mesh vertices
+                if (renderObj.mesh.vertices.empty()) continue;
 
-                // Get brush bounds (this is simplified - in production you'd calculate exact bounds)
                 glm::vec3 bmin(FLT_MAX), bmax(-FLT_MAX);
-
-                // Sample some points from the brush planes to estimate bounds
-                for (const auto& plane : brush.planes) {
-                    // Use plane distance as a rough guide
-                    glm::vec3 planePoint = plane.normal * plane.distance;
-                    bmin = glm::min(bmin, planePoint - glm::vec3(100.0f));
-                    bmax = glm::max(bmax, planePoint + glm::vec3(100.0f));
+                for (const auto& vertex : renderObj.mesh.vertices) {
+                    bmin = glm::min(bmin, vertex.position);
+                    bmax = glm::max(bmax, vertex.position);
                 }
 
-                AABB brushAABB{bmin, bmax};
+                AABB meshAABB{bmin, bmax};
 
-                // Raycast against brush AABB
-                CollisionResult hitResult = Collision::RaycastAABB(target, direction, brushAABB, desiredDistance);
+                // Raycast against mesh AABB
+                CollisionResult hitResult = Collision::RaycastAABB(target, direction, meshAABB, desiredDistance);
                 if (hitResult.hit) {
                     float hitDistance = hitResult.penetration; // penetration stores the ray distance (t value)
                     if (hitDistance > 0.0f && hitDistance < minDistance) {
                         minDistance = hitDistance - cameraRadius; // Pull back by camera radius
-                        if (minDistance < 0.5_u) minDistance = 0.5_u; // Minimum distance
+                        if (minDistance < 0.5_u) minDistance = 0.5_u; // Minimum distance (0.5m)
                     }
                 }
             }

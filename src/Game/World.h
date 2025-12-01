@@ -35,6 +35,9 @@ namespace VibeReaper {
         std::vector<const Entity*> GetEntitiesByClass(const std::string& classname) const;
         const Entity* GetWorldspawn() const { return &worldspawn; }
 
+        // Collision queries
+        const std::vector<RenderObject>& GetLevelGeometry() const { return levelGeometry; }
+
     private:
         // Level data
         std::vector<RenderObject> levelGeometry;
