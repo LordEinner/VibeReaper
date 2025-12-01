@@ -259,11 +259,11 @@ int main(int argc, char* argv[]) {
         }
 
         // Debug logging (on-demand)
-        if (input.IsKeyJustPressed(SDL_SCANCODE_SPACE)) {
-            camera.LogDebugInfo(&world, false); // Spacebar = system working incorrectly
+        if (input.IsKeyJustPressed(SDL_SCANCODE_E)) {
+            camera.LogDebugInfo(&world, false); // E = system working incorrectly
         }
-        if (input.IsKeyJustPressed(SDL_SCANCODE_RETURN)) {
-            camera.LogDebugInfo(&world, true);  // Enter = system working correctly
+        if (input.IsKeyJustPressed(SDL_SCANCODE_Q)) {
+            camera.LogDebugInfo(&world, true);  // Q = system working correctly
         }
 
         // Camera follow player center (half of player height: 1.75m / 2 = 0.875m)

@@ -183,7 +183,7 @@ namespace VibeReaper {
 
     void Camera::LogDebugInfo(const World* world, bool isWorking) const {
         LOG_INFO("========================================");
-        LOG_INFO(isWorking ? "DEBUG: System WORKING CORRECTLY (Enter key)" : "DEBUG: System WORKING INCORRECTLY (Spacebar)");
+        LOG_INFO(isWorking ? "DEBUG: System WORKING CORRECTLY (Q key)" : "DEBUG: System WORKING INCORRECTLY (E key)");
         LOG_INFO("========================================");
 
         // Camera state

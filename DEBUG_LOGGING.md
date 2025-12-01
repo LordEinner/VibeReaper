@@ -7,8 +7,8 @@ When running VibeReaper.exe, you can capture detailed camera collision debug inf
 1. **Run the game** from `build/bin/VibeReaper.exe`
 
 2. **During gameplay**, press:
-   - **SPACEBAR** - Log debug info when camera is **working incorrectly**
-   - **ENTER** - Log debug info when camera is **working correctly**
+   - **Q key** - Log debug info when camera is **working correctly**
+   - **E key** - Log debug info when camera is **working incorrectly**
 
 3. **Find the log file**:
    - Location: `build/bin/VibeReaper.log`
