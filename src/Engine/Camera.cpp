@@ -85,6 +85,14 @@ namespace VibeReaper {
 
                 AABB meshAABB{bmin, bmax};
 
+                // Skip if AABB center is behind the player (not between player and camera)
+                glm::vec3 aabbCenter = (meshAABB.min + meshAABB.max) * 0.5f;
+                glm::vec3 toAABB = aabbCenter - target;
+                float dotProduct = glm::dot(glm::normalize(toAABB), direction);
+
+                // Only consider geometry in the camera direction (dot > 0 means in same direction)
+                if (dotProduct <= 0.0f) continue;
+
                 // Raycast against mesh AABB
                 CollisionResult hitResult = Collision::RaycastAABB(target, direction, meshAABB, desiredDistance);
                 if (hitResult.hit) {
