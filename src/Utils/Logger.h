@@ -47,6 +47,7 @@ private:
     std::string GetColorCode(LogLevel level) const;
 
     bool m_consoleOutput;
+    std::ofstream m_logFile;
 };
 
 } // namespace VibeReaper
